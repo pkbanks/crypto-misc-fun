@@ -4,7 +4,7 @@ require 'nokogiri'
 # references:
 # https://www.cryptocompare.com/api/#-api-data-price-
 
-response = HTTParty.get("https://min-api.cryptocompare.com/data/histoday?fsym=BTC&tsym=USD&limit=60&aggregate=3&e=CCCAGG")
+# response = HTTParty.get("https://min-api.cryptocompare.com/data/histohour?fsym=ETH&tsym=USD&limit=60&aggregate=3&e=Kraken")
 
 # currencies and coins we care about
 core_currencies = ["USD", "EUR", "JPY", "GBP", "CHF", "CAD", "AUD", "NZD", "ZAR", "CNY"]
@@ -16,17 +16,20 @@ core_coins = ["bitcoin", "bitcoin-cash", "ethereum", "ethereum-classic", "liteco
 # 	puts getDateFromUnixDate(x[:time])
 # end
 
-#API returns the prices for every three days
+
+# API returns the prices for every three days
 # response["Data"].each do |x|
 # 	puts getDateFromUnixDate(x["time"].to_s)
 # end
 #
 # puts response["Data"]
 
+
+response = 
 def getDateFromUnixDate(unixDate)
 	# converts unixDate (String) and returns a friendly date (String)
 	date = DateTime.strptime(unixDate, '%s')
-	return date.strftime('%a, %b %d, %Y')
+	return date.strftime('%a, %b %d, %Y, %H:%M')
 end
 
 def coin_spot_price(fromSym, *toSyms)
@@ -38,7 +41,7 @@ def coin_spot_price(fromSym, *toSyms)
 	# example, to go from US Dollars, to Bitcoin, Ethereum, and LiteCoint:
 	# coin_spot_price('USD', 'BTC', 'ETH', 'LTC')
 	# returns
-	
+
 	endpoint = "https://min-api.cryptocompare.com/data/price?"
 	url = endpoint + "fsym=" + fromSym + "&tsyms=" + toSyms.join(",")
 
@@ -55,13 +58,13 @@ def prices(base_currency, *coins)
 	hash_response = coin_spot_price(base_currency, coins)
 	result = {}
 	hash_response.each do |coin, val|
-		result[coin] = 1/val 
+		result[coin] = 1/val
 	end
 	result
 end
 
 
-def price_hist(base_currency, num_days=30, *coins)
+
 	# example: get prices history of bitcoin, ethereum, litecoin,
 	# in USD, for last 100 days
 	# 		price_hist("USD", 100, "BTC", "ETH", "LTC")
@@ -85,3 +88,4 @@ end
 
 # p price_hist("USD", "BTC")
 p price_hist_by_hour("ETH", "USD")
+
