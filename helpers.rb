@@ -6,6 +6,10 @@ require 'nokogiri'
 
 response = HTTParty.get("https://min-api.cryptocompare.com/data/histoday?fsym=BTC&tsym=USD&limit=60&aggregate=3&e=CCCAGG")
 
+# currencies and coins we care about
+core_currencies = ["USD", "EUR", "JPY", "GBP", "CHF", "CAD", "AUD", "NZD", "ZAR", "CNY"]
+core_coins = ["bitcoin", "bitcoin-cash", "ethereum", "ethereum-classic", "litecoin", "dash", "monero", "zcash", "ripple"]
+
 # puts response["Data"]
 
 # response["Data"].each do |x|
@@ -68,4 +72,16 @@ def price_hist(base_currency, num_days=30, *coins)
 	response
 end
 
-p price_hist("USD", "BTC")
+def price_hist_by_hour(from_currency="BTC", to_currency="USD", aggregate=1, num_hours=24*5)
+	# from_currency = "BTC"
+	# to_currency = "USD"
+	# aggregate = 1		# hour frequency
+	# num_hours = 24 * 5  # how many hours
+
+	url = 'https://min-api.cryptocompare.com/data/histohour?fsym=' + from_currency + '&tsym=' + to_currency + '&limit=' + num_hours.to_s + '&aggregate=' + aggregate.to_s
+	response = HTTParty.get(url).parsed_response
+	return response
+end
+
+# p price_hist("USD", "BTC")
+p price_hist_by_hour("ETH", "USD")
