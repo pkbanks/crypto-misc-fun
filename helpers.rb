@@ -6,6 +6,16 @@ require 'nokogiri'
 
 # response = HTTParty.get("https://min-api.cryptocompare.com/data/histohour?fsym=ETH&tsym=USD&limit=60&aggregate=3&e=Kraken")
 
+# currencies and coins we care about
+core_currencies = ["USD", "EUR", "JPY", "GBP", "CHF", "CAD", "AUD", "NZD", "ZAR", "CNY"]
+core_coins = ["bitcoin", "bitcoin-cash", "ethereum", "ethereum-classic", "litecoin", "dash", "monero", "zcash", "ripple"]
+
+# puts response["Data"]
+
+# response["Data"].each do |x|
+# 	puts getDateFromUnixDate(x[:time])
+# end
+
 
 # API returns the prices for every three days
 # response["Data"].each do |x|
@@ -40,6 +50,11 @@ def coin_spot_price(fromSym, *toSyms)
 end
 
 def prices(base_currency, *coins)
+	# returns a hash of prices of coins per base_currency
+	# for example, if we want to get prices of bitcoin,
+	# ethereum, and litecoin in USD...
+	# prices("USD", "BTC", "ETC", "LTC")
+
 	hash_response = coin_spot_price(base_currency, coins)
 	result = {}
 	hash_response.each do |coin, val|
@@ -49,12 +64,28 @@ def prices(base_currency, *coins)
 end
 
 
-def price_hist(base_currency, num_days=30, *coins)
 
+	# example: get prices history of bitcoin, ethereum, litecoin,
+	# in USD, for last 100 days
+	# 		price_hist("USD", 100, "BTC", "ETH", "LTC")
+
+	endpoint = 'https://min-api.cryptocompare.com/data/histoday'
+	url = endpoint + '?fsym=' + base_currency + '&tsym=' + coins.join(',') + '&limit=' + num_days
+	response = HTTParty.get(url).parsed_response
+	response
 end
 
-# puts prices('USD', 'BTC', 'ETH', 'LTC')
+def price_hist_by_hour(from_currency="BTC", to_currency="USD", aggregate=1, num_hours=24*5)
+	# from_currency = "BTC"
+	# to_currency = "USD"
+	# aggregate = 1		# hour frequency
+	# num_hours = 24 * 5  # how many hours
 
-response["Data"].each do |x|
-	puts "Time: #{getDateFromUnixDate(x["time"].to_s)}"
+	url = 'https://min-api.cryptocompare.com/data/histohour?fsym=' + from_currency + '&tsym=' + to_currency + '&limit=' + num_hours.to_s + '&aggregate=' + aggregate.to_s
+	response = HTTParty.get(url).parsed_response
+	return response
 end
+
+# p price_hist("USD", "BTC")
+p price_hist_by_hour("ETH", "USD")
+
