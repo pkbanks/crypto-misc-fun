@@ -43,6 +43,11 @@ def coin_spot_price(fromSym, *toSyms)
 end
 
 def prices(base_currency, *coins)
+	# returns a hash of prices of coins per base_currency
+	# for example, if we want to get prices of bitcoin,
+	# ethereum, and litecoin in USD...
+	# prices("USD", "BTC", "ETC", "LTC")
+
 	hash_response = coin_spot_price(base_currency, coins)
 	result = {}
 	hash_response.each do |coin, val|
@@ -51,3 +56,16 @@ def prices(base_currency, *coins)
 	result
 end
 
+
+def price_hist(base_currency, num_days=30, *coins)
+	# example: get prices history of bitcoin, ethereum, litecoin,
+	# in USD, for last 100 days
+	# 		price_hist("USD", 100, "BTC", "ETH", "LTC")
+
+	endpoint = 'https://min-api.cryptocompare.com/data/histoday'
+	url = endpoint + '?fsym=' + base_currency + '&tsym=' + coins.join(',') + '&limit=' + num_days
+	response = HTTParty.get(url).parsed_response
+	response
+end
+
+p price_hist("USD", "BTC")
