@@ -12,15 +12,21 @@ def getDateFromUnixDate(unixDate, format = '%H:%M %a %d %b %Y')
 	# converts unixDate (String) and returns a friendly date (String)
 	date = DateTime.strptime(unixDate, '%s')
 	return date.strftime(format)
+
+def getDateFromUnixDate(unixDate)
+	# converts unixDate (String) and returns a friendly date (String)
+	date = DateTime.strptime(unixDate, '%s')
+	return date.strftime('%a, %b %d, %Y, %H:%M')
 end
 
 def coin_spot_price(fromSym, *toSyms)
 	# fromSym: symbol of coin or currency, as String
 	# toSyms: to symbol, as multiple Strings
+  
 	# returns a hash / object literal, where each key (String)
 	# returns a value that is equal to the number of fromSym per toSym
-
-	# example, to get how much Bitcoin, Ethereum, Litecoin
+	
+  # example, to get how much Bitcoin, Ethereum, Litecoin
 	# we can buy with 1 USD:
 	# result = coin_spot_price('USD', 'BTC', 'ETH', 'LTC')
 	# p result["BTC"]  # <-- how many BTC per dollar
@@ -29,8 +35,8 @@ def coin_spot_price(fromSym, *toSyms)
 	# coin_spot_price("BTC", "USD", "CAD", "CHF", "JPY")
 
 	# to get how many USD per BTC, use the prices method
-	
-	endpoint = "https://min-api.cryptocompare.com/data/price?"
+		
+  endpoint = "https://min-api.cryptocompare.com/data/price?"
 	url = endpoint + "fsym=" + fromSym + "&tsyms=" + toSyms.join(",")
 
 	return HTTParty.get(url).parsed_response
@@ -46,13 +52,13 @@ def prices(base_currency, *coins)
 	hash_response = coin_spot_price(base_currency, coins)
 	result = {}
 	hash_response.each do |coin, val|
-		result[coin] = 1/val 
+		result[coin] = 1/val
 	end
 	result
 end
 
 
-def price_hist(base_currency, num_days=30, *coins)
+
 	# example: get prices history of bitcoin, ethereum, litecoin,
 	# in USD, for last 100 days
 	# 		price_hist("USD", 100, "BTC", "ETH", "LTC")
@@ -76,3 +82,4 @@ end
 
 # p price_hist("USD", "BTC")
 p price_hist_by_hour("ETH", "USD")
+
