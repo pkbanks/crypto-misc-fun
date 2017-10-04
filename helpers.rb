@@ -6,7 +6,7 @@ require 'nokogiri'
 
 # currencies and coins we care about
 core_currencies = ["USD", "EUR", "JPY", "GBP", "CHF", "CAD", "AUD", "NZD", "ZAR", "CNY"]
-core_coins = ["bitcoin", "bitcoin-cash", "ethereum", "ethereum-classic", "litecoin", "dash", "monero", "zcash", "ripple"]
+core_coins = [{name: "bitcoin", symbol: 'BTC'}, {name: "bitcoin-cash", symbol: "BCH"}, {name: "ethereum", symbol:"ETH"}, {name: "ethereum-classic",symbol:"ETC"}, {name: "litecoin", symbol:"LTC"}, {name: "dash", symbol:"DASH"}, {name: "monero", symbol:"XMR"}, {name: "zcash", symbol:"ZEC"}, {name: "ripple", symbol:"XRP"}]
 
 def getDateFromUnixDate(unixDate, format = '%H:%M %a %d %b %Y')
 	# converts unixDate (String) and returns a friendly date (String)
@@ -29,7 +29,6 @@ def coin_spot_price(fromSym, *toSyms)
 	# coin_spot_price("BTC", "USD", "CAD", "CHF", "JPY")
 
 	# to get how many USD per BTC, use the prices method
-	
 	endpoint = "https://min-api.cryptocompare.com/data/price?"
 	url = endpoint + "fsym=" + fromSym.upcase + "&tsyms=" + toSyms.map{|coin| coin.upcase}.join(",")
 	return HTTParty.get(url).parsed_response
@@ -41,15 +40,13 @@ def prices(base_currency, *coins)
 	# for example, if we want to get prices of bitcoin,
 	# ethereum, and litecoin in USD...
 	# prices("USD", "BTC", "ETC", "LTC")
-
-	hash_response = coin_spot_price(base_currency, coins)
+	hash_response = coin_spot_price(base_currency, coins.join(','))
 	result = {}
 	hash_response.each do |coin, val|
 		result[coin] = 1/val 
 	end
 	result
 end
-
 
 def price_hist(base_currency, num_days=30, *coins)
 	# example: get price history of bitcoin, ethereum, litecoin,
@@ -73,16 +70,23 @@ def price_hist_by_hour(from_currency="BTC", to_currency="USD", aggregate=1, num_
 	return response
 end
 
-def tests
+def tests(coins)
 	# get btc in currencies
-	currencies = ['usd', 'jpy', 'chf']
-	response = coin_spot_price('btc', currencies.join(','))
-	puts "BTC, spot"
-	currencies.each do |c|
-		puts "#{c}\t #{response[c.upcase]}"
+	# currencies = ['usd', 'jpy', 'chf']
+	# response = coin_spot_price('btc', currencies.join(','))
+	# puts "BTC, spot"
+	# currencies.each do |c|
+	# 	puts "#{c}\t #{response[c.upcase]}"
+	# end
+
+	# get coin quotes in USD
+	coins_a = []
+	coins.each{|coin| coins_a << coin[:symbol].downcase}
+	response = prices('usd', *coins_a)
+	coins.each do |coin|
+		puts "#{coin[:symbol]}\t #{response[coin[:symbol]]}"
 	end
-
-
+	
 end
 
-tests
+tests(core_coins)
