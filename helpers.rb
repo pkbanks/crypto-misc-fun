@@ -31,8 +31,7 @@ def coin_spot_price(fromSym, *toSyms)
 	# to get how many USD per BTC, use the prices method
 	
 	endpoint = "https://min-api.cryptocompare.com/data/price?"
-	url = endpoint + "fsym=" + fromSym + "&tsyms=" + toSyms.join(",")
-
+	url = endpoint + "fsym=" + fromSym.upcase + "&tsyms=" + toSyms.map{|coin| coin.upcase}.join(",")
 	return HTTParty.get(url).parsed_response
 
 end
@@ -53,12 +52,12 @@ end
 
 
 def price_hist(base_currency, num_days=30, *coins)
-	# example: get prices history of bitcoin, ethereum, litecoin,
+	# example: get price history of bitcoin, ethereum, litecoin,
 	# in USD, for last 100 days
 	# 		price_hist("USD", 100, "BTC", "ETH", "LTC")
 
 	endpoint = 'https://min-api.cryptocompare.com/data/histoday'
-	url = endpoint + '?fsym=' + base_currency + '&tsym=' + coins.join(',') + '&limit=' + num_days
+	url = endpoint + '?fsym=' + base_currency.upcase + '&tsym=' + coins.map{|coin| coin.upcase}.join(',') + '&limit=' + num_days.to_s
 	response = HTTParty.get(url).parsed_response
 	response
 end
@@ -69,10 +68,21 @@ def price_hist_by_hour(from_currency="BTC", to_currency="USD", aggregate=1, num_
 	# aggregate = 1		# hour frequency
 	# num_hours = 24 * 5  # how many hours
 
-	url = 'https://min-api.cryptocompare.com/data/histohour?fsym=' + from_currency + '&tsym=' + to_currency + '&limit=' + num_hours.to_s + '&aggregate=' + aggregate.to_s
+	url = 'https://min-api.cryptocompare.com/data/histohour?fsym=' + from_currency.upcase + '&tsym=' + to_currency.upcase + '&limit=' + num_hours.to_s + '&aggregate=' + aggregate.to_s
 	response = HTTParty.get(url).parsed_response
 	return response
 end
 
-# p price_hist("USD", "BTC")
-p price_hist_by_hour("ETH", "USD")
+def tests
+	# get btc in currencies
+	currencies = ['usd', 'jpy', 'chf']
+	response = coin_spot_price('btc', currencies.join(','))
+	puts "BTC, spot"
+	currencies.each do |c|
+		puts "#{c}\t #{response[c.upcase]}"
+	end
+
+
+end
+
+tests
