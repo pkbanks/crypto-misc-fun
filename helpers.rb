@@ -4,28 +4,15 @@ require 'nokogiri'
 # references:
 # https://www.cryptocompare.com/api/#-api-data-price-
 
-# response = HTTParty.get("https://min-api.cryptocompare.com/data/histohour?fsym=ETH&tsym=USD&limit=60&aggregate=3&e=Kraken")
-
 # currencies and coins we care about
 core_currencies = ["USD", "EUR", "JPY", "GBP", "CHF", "CAD", "AUD", "NZD", "ZAR", "CNY"]
 core_coins = ["bitcoin", "bitcoin-cash", "ethereum", "ethereum-classic", "litecoin", "dash", "monero", "zcash", "ripple"]
 
-# puts response["Data"]
+def getDateFromUnixDate(unixDate, format = '%H:%M %a %d %b %Y')
+	# converts unixDate (String) and returns a friendly date (String)
+	date = DateTime.strptime(unixDate, '%s')
+	return date.strftime(format)
 
-# response["Data"].each do |x|
-# 	puts getDateFromUnixDate(x[:time])
-# end
-
-
-# API returns the prices for every three days
-# response["Data"].each do |x|
-# 	puts getDateFromUnixDate(x["time"].to_s)
-# end
-#
-# puts response["Data"]
-
-
-response = 
 def getDateFromUnixDate(unixDate)
 	# converts unixDate (String) and returns a friendly date (String)
 	date = DateTime.strptime(unixDate, '%s')
@@ -33,16 +20,23 @@ def getDateFromUnixDate(unixDate)
 end
 
 def coin_spot_price(fromSym, *toSyms)
-	# fromSym: from symbol, as String
+	# fromSym: symbol of coin or currency, as String
 	# toSyms: to symbol, as multiple Strings
+  
 	# returns a hash / object literal, where each key (String)
 	# returns a value that is equal to the number of fromSym per toSym
+	
+  # example, to get how much Bitcoin, Ethereum, Litecoin
+	# we can buy with 1 USD:
+	# result = coin_spot_price('USD', 'BTC', 'ETH', 'LTC')
+	# p result["BTC"]  # <-- how many BTC per dollar
 
-	# example, to go from US Dollars, to Bitcoin, Ethereum, and LiteCoint:
-	# coin_spot_price('USD', 'BTC', 'ETH', 'LTC')
-	# returns
+	# to find out prices for 1 BTC in USD, JPY, CAD, CHF...
+	# coin_spot_price("BTC", "USD", "CAD", "CHF", "JPY")
 
-	endpoint = "https://min-api.cryptocompare.com/data/price?"
+	# to get how many USD per BTC, use the prices method
+		
+  endpoint = "https://min-api.cryptocompare.com/data/price?"
 	url = endpoint + "fsym=" + fromSym + "&tsyms=" + toSyms.join(",")
 
 	return HTTParty.get(url).parsed_response
@@ -50,7 +44,7 @@ def coin_spot_price(fromSym, *toSyms)
 end
 
 def prices(base_currency, *coins)
-	# returns a hash of prices of coins per base_currency
+	# returns a hash of prices in base_currency for each of the coins OR currency
 	# for example, if we want to get prices of bitcoin,
 	# ethereum, and litecoin in USD...
 	# prices("USD", "BTC", "ETC", "LTC")
