@@ -5,8 +5,8 @@ require 'nokogiri'
 # https://www.cryptocompare.com/api/#-api-data-price-
 
 # currencies and coins we care about
-core_currencies = ["USD", "EUR", "JPY", "GBP", "CHF", "CAD", "AUD", "NZD", "ZAR", "CNY"]
-core_coins = [{name: "bitcoin", symbol: 'BTC'}, {name: "bitcoin-cash", symbol: "BCH"}, {name: "ethereum", symbol:"ETH"}, {name: "ethereum-classic",symbol:"ETC"}, {name: "litecoin", symbol:"LTC"}, {name: "dash", symbol:"DASH"}, {name: "monero", symbol:"XMR"}, {name: "zcash", symbol:"ZEC"}, {name: "ripple", symbol:"XRP"}]
+CORE_CURRENCIES = ["USD", "EUR", "JPY", "GBP", "CHF", "CAD", "AUD", "NZD", "ZAR", "CNY"]
+CORE_COINS = [{name: "bitcoin", symbol: 'BTC'}, {name: "bitcoin-cash", symbol: "BCH"}, {name: "ethereum", symbol:"ETH"}, {name: "ethereum-classic",symbol:"ETC"}, {name: "litecoin", symbol:"LTC"}, {name: "dash", symbol:"DASH"}, {name: "monero", symbol:"XMR"}, {name: "zcash", symbol:"ZEC"}, {name: "ripple", symbol:"XRP"}]
 
 def getDateFromUnixDate(unixDate, format = '%H:%M %a %d %b %Y')
 	# converts unixDate (String) and returns a friendly date (String)
@@ -48,6 +48,26 @@ def prices(base_currency, *coins)
 	result
 end
 
+def prices_all(base_currency)
+	# use this to get back a list of coin prices, in base_currency
+	# returns an array of hashes:
+	# :symbol - returns the symbol of the coin or currency as a string, such as "BTC"
+	# :name - name of the coin or currency (string)
+
+	# example:
+	#  to get in USD, all coins in
+
+	# CORE_COINS is a constant, an array of hashes
+	result = CORE_COINS.clone 									# copy CORE_COINS, an array of hashes
+	coins = result.map{|coin| coin[:symbol]} 		# array of strings, one for each coin
+	response = prices(base_currency, *coins)		# fetch prices, returned as a hash
+	result.each do |coin|
+		# update with prices
+		coin[:price] = response[coin[:symbol]] if response.include? coin[:symbol]
+	end
+	return result
+end
+
 def price_hist(base_currency, num_days=30, *coins)
 	# example: get price history of bitcoin, ethereum, litecoin,
 	# in USD, for last 100 days
@@ -70,23 +90,8 @@ def price_hist_by_hour(from_currency="BTC", to_currency="USD", aggregate=1, num_
 	return response
 end
 
-def tests(coins)
-	# get btc in currencies
-	# currencies = ['usd', 'jpy', 'chf']
-	# response = coin_spot_price('btc', currencies.join(','))
-	# puts "BTC, spot"
-	# currencies.each do |c|
-	# 	puts "#{c}\t #{response[c.upcase]}"
-	# end
-
-	# get coin quotes in USD
-	coins_a = []
-	coins.each{|coin| coins_a << coin[:symbol].downcase}
-	response = prices('usd', *coins_a)
-	coins.each do |coin|
-		puts "#{coin[:symbol]}\t #{response[coin[:symbol]]}"
-	end
+def tests
 	
 end
 
-tests(core_coins)
+tests
