@@ -5,7 +5,7 @@ require 'nokogiri'
 # https://www.cryptocompare.com/api/#-api-data-price-
 
 # currencies and coins we care about
-CORE_CURRENCIES = ["USD", "EUR", "JPY", "GBP", "CHF", "CAD", "AUD", "NZD", "ZAR", "CNY"]
+CORE_CURRENCIES = [{name: "US Dollar", symbol: "USD"}, {name: "Euro", symbol: "EUR"}, {name: "Japanese Yen", symbol: "JPY"}, {name: "British Pound", symbol: "GBP"}, {name: "Swiss Franc", symbol: "CHF"}, {name: "Canadian Dollar", symbol: "CAD"}, {name: "Australian Dollar", symbol: "AUD"}, {name: "New Zealand Dollar", symbol: "NZD"}, {name: "South African Rand", symbol: "ZAR"}, {name: "Chinese Yuan Renminbi", symbol: "CNY"}]
 CORE_COINS = [{name: "bitcoin", symbol: 'BTC'}, {name: "bitcoin-cash", symbol: "BCH"}, {name: "ethereum", symbol:"ETH"}, {name: "ethereum-classic",symbol:"ETC"}, {name: "litecoin", symbol:"LTC"}, {name: "dash", symbol:"DASH"}, {name: "monero", symbol:"XMR"}, {name: "zcash", symbol:"ZEC"}, {name: "ripple", symbol:"XRP"}]
 
 def getDateFromUnixDate(unixDate, format = '%H:%M %a %d %b %Y')
@@ -83,7 +83,7 @@ def price_hist_by_hour(from_currency="BTC", to_currency="USD", aggregate=1, num_
 	# from_currency = "BTC"
 	# to_currency = "USD"
 	# aggregate = 1		# hour frequency
-	# num_hours = 24 * 5  # how many hours
+		# num_hours = 24 * 5  # how many hours
 
 	url = 'https://min-api.cryptocompare.com/data/histohour?fsym=' + from_currency.upcase + '&tsym=' + to_currency.upcase + '&limit=' + num_hours.to_s + '&aggregate=' + aggregate.to_s
 	response = HTTParty.get(url).parsed_response
@@ -91,7 +91,7 @@ def price_hist_by_hour(from_currency="BTC", to_currency="USD", aggregate=1, num_
 end
 
 def tests
-	
+	p price_hist_by_hour("ETH")
 end
 
 tests
