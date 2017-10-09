@@ -91,7 +91,7 @@ def price_hist_by_hour(from_currency="BTC", to_currency="USD", aggregate=1, num_
 end
 
 def tests
-	p price_hist_by_hour("ETH")
+	price_hist_by_hour()
 end
 
-tests
+# {"time"=>1507060800, "close"=>4286.6, "high"=>4293.37, "low"=>4267.22, "open"=>4276.7, "volumefrom"=>1959.84, "volumeto"=>8404461.87}
